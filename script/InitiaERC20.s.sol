@@ -2,9 +2,9 @@
 pragma solidity ^0.8.13;
 
 import {Script, console2} from "forge-std/Script.sol";
-import {InitiaCustomERC20} from "../src/InitiaCustomERC20.sol";
+import {InitiaERC20} from "evm-contracts/initia_erc20/InitiaERC20.sol";
 
-contract NewInitiaERC20Script is Script {
+contract InitiaERC20Script is Script {
     /**
      * @dev Relevant source part starts here and spans across multiple lines
      */
@@ -20,6 +20,6 @@ contract NewInitiaERC20Script is Script {
         vm.startBroadcast(deployerPrivateKey);
 
         // Deploy
-        InitiaCustomERC20 erc20 = new InitiaCustomERC20("TEST", "Tst", 18);
+        new InitiaERC20("BASE", "BE", 18);
     }
 }
