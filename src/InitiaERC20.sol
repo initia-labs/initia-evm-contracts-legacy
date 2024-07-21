@@ -1,13 +1,20 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./interfaces/IInitiaERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./interfaces/IERC20.sol";
+import "./utils/Ownable.sol";
 import "./ERC20Registry.sol";
-import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 import "./ERC20ACL.sol";
+import {ERC165, IERC165} from "./ERC165.sol";
 
-contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165, ERC20ACL {
+contract ERC20 is IERC20, Ownable, ERC20Registry, ERC165, ERC20ACL {
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(
+        address indexed owner,
+        address indexed spender,
+        uint256 value
+    );
+
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
     string public name;
@@ -18,8 +25,12 @@ contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165
     /**
      * @dev See {IERC165-supportsInterface}.
      */
-    function supportsInterface(bytes4 interfaceId) public view virtual override(IERC165, ERC165) returns (bool) {
-        return interfaceId == type(IERC20).interfaceId || super.supportsInterface(interfaceId);
+    function supportsInterface(
+        bytes4 interfaceId
+    ) public view virtual override(IERC165, ERC165) returns (bool) {
+        return
+            interfaceId == type(IERC20).interfaceId ||
+            super.supportsInterface(interfaceId);
     }
 
     // for custom erc20s, you should add `register_erc20` modifier to the constructor
@@ -29,13 +40,20 @@ contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165
         decimals = _decimals;
     }
 
-    function _transfer(address sender, address recipient, uint256 amount) internal register_erc20_store(recipient) {
+    function _transfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) internal register_erc20_store(recipient) {
         balanceOf[sender] -= amount;
         balanceOf[recipient] += amount;
         emit Transfer(sender, recipient, amount);
     }
 
-    function _mint(address to, uint256 amount) internal register_erc20_store(to) {
+    function _mint(
+        address to,
+        uint256 amount
+    ) internal register_erc20_store(to) {
         balanceOf[to] += amount;
         totalSupply += amount;
         emit Transfer(address(0), to, amount);
@@ -47,7 +65,10 @@ contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165
         emit Transfer(from, address(0), amount);
     }
 
-    function transfer(address recipient, uint256 amount) external transferable(recipient) returns (bool) {
+    function transfer(
+        address recipient,
+        uint256 amount
+    ) external transferable(recipient) returns (bool) {
         _transfer(msg.sender, recipient, amount);
         return true;
     }
@@ -58,11 +79,11 @@ contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165
         return true;
     }
 
-    function transferFrom(address sender, address recipient, uint256 amount)
-        external
-        transferable(recipient)
-        returns (bool)
-    {
+    function transferFrom(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external transferable(recipient) returns (bool) {
         allowance[sender][msg.sender] -= amount;
         _transfer(sender, recipient, amount);
         return true;
@@ -72,11 +93,18 @@ contract InitiaERC20 is IInitiaERC20, Ownable(msg.sender), ERC20Registry, ERC165
         _mint(to, amount);
     }
 
-    function burn(address from, uint256 amount) external burnable(from) onlyOwner {
+    function burn(
+        address from,
+        uint256 amount
+    ) external burnable(from) onlyOwner {
         _burn(from, amount);
     }
 
-    function sudoTransfer(address sender, address recipient, uint256 amount) external onlyChain {
+    function sudoTransfer(
+        address sender,
+        address recipient,
+        uint256 amount
+    ) external onlyChain {
         _transfer(sender, recipient, amount);
     }
 

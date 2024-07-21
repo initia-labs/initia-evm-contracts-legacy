@@ -2,14 +2,15 @@
 
 pragma solidity ^0.8.24;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import {ERC721} from "./ERC721.sol";
+import {Ownable} from "./utils/Ownable.sol";
+import {ERC721Utils} from "./utils/ERC721Utils.sol";
 
 contract ICS721ERC721 is ERC721, Ownable {
+
     mapping(uint256 => string) private tokenUris;
     mapping(uint256 => string) private tokenOriginIds;
-
-    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) Ownable(msg.sender) {}
+    constructor(string memory name_, string memory symbol_) ERC721(name_, symbol_) Ownable() {}
 
     function burn(uint256 tokenId) public {
         address owner = _requireOwned(tokenId);
@@ -24,10 +25,7 @@ contract ICS721ERC721 is ERC721, Ownable {
         mint(receiver, tokenId, _tokenUri, "");
     }
 
-    function mint(address receiver, uint256 tokenId, string memory _tokenUri, string memory _tokenOriginId)
-        public
-        onlyOwner
-    {
+    function mint(address receiver, uint256 tokenId, string memory _tokenUri, string memory _tokenOriginId) public onlyOwner {
         _safeMint(receiver, tokenId);
         tokenUris[tokenId] = _tokenUri;
         tokenOriginIds[tokenId] = _tokenOriginId;
@@ -42,6 +40,7 @@ contract ICS721ERC721 is ERC721, Ownable {
     }
 
     function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public override {
-        super.safeTransferFrom(from, to, tokenId, data);
+        transferFrom(from, to, tokenId);
+        ERC721Utils.checkOnERC721Received(_msgSender(), from, to, tokenId, data);
     }
 }

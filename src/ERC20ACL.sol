@@ -17,21 +17,30 @@ contract ERC20ACL {
 
     // check if the sender is a module address
     modifier burnable(address from) {
-        require(!COSMOS_CONTRACT.is_module_address(from), "ERC20: burn from module address");
+        require(
+            !COSMOS_CONTRACT.is_module_address(from),
+            "ERC20: burn from module address"
+        );
 
         _;
     }
 
     // check if the recipient is a blocked address
     modifier mintable(address to) {
-        require(!COSMOS_CONTRACT.is_blocked_address(to), "ERC20: mint to blocked address");
+        require(
+            !COSMOS_CONTRACT.is_blocked_address(to),
+            "ERC20: mint to blocked address"
+        );
 
         _;
     }
 
     // check if an recipient is blocked in bank module
     modifier transferable(address to) {
-        require(!COSMOS_CONTRACT.is_blocked_address(to), "ERC20: transfer to blocked address");
+        require(
+            !COSMOS_CONTRACT.is_blocked_address(to),
+            "ERC20: transfer to blocked address"
+        );
 
         _;
     }

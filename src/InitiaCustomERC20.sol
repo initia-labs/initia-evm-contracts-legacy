@@ -3,11 +3,11 @@ pragma solidity ^0.8.24;
 
 import "./ERC20ACL.sol";
 import "../src/ERC20Registry.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "./utils/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/introspection/ERC165.sol";
 
-contract InitiaCustomERC20 is IERC20, Ownable(msg.sender), ERC20Registry, ERC165, ERC20ACL {
+contract InitiaCustomERC20 is IERC20, Ownable, ERC20Registry, ERC165, ERC20ACL {
     mapping(address => uint256) public balanceOf;
     mapping(address => mapping(address => uint256)) public allowance;
     string public name;
