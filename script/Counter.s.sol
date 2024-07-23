@@ -8,8 +8,7 @@ contract NewInitiaERC20Script is Script {
     /**
      * @dev Relevant source part starts here and spans across multiple lines
      */
-    function setUp() public {
-    }
+    function setUp() public {}
 
     /**
      * @dev Main deployment script
